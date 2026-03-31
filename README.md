@@ -1,5 +1,3 @@
-## This mod got merged into the Vanilla game within the 1.20.2 release, so it's archived. 
-
 # DStatHud
 Fabric mod that shows download and upload speed in F3 menu
 
