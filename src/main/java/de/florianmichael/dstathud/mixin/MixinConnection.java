@@ -18,24 +18,23 @@
 
 package de.florianmichael.dstathud.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import de.florianmichael.dstathud.NetworkTrafficHandler;
-import de.florianmichael.dstathud.StringUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.debug.DebugHudLines;
-import net.minecraft.client.gui.hud.debug.TpsDebugHudEntry;
-import net.minecraft.util.Formatting;
+import io.netty.channel.ChannelPipeline;
+import net.minecraft.network.BandwidthDebugMonitor;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.PacketFlow;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(TpsDebugHudEntry.class)
-public class MixinTpsDebugHudEntry {
-    @Inject(method = "render", at = @At(value = "RETURN", target = "Lnet/minecraft/client/gui/hud/debug/DebugHudLines;addLine(Ljava/lang/String;)V"))
-    public void showDStat(CallbackInfo ci, @Local(argsOnly = true) DebugHudLines lines) {
-        if (MinecraftClient.getInstance().isInSingleplayer()) return;
+@Mixin(Connection.class)
+public class MixinConnection {
 
-        lines.addLine(Formatting.GOLD + StringUtils.formatBytes(NetworkTrafficHandler.outgoing) + "/s Up, " + StringUtils.formatBytes(NetworkTrafficHandler.incoming) + "/s Down");
+    @Inject(method = "configureSerialization", at = @At("RETURN"))
+    private static void addNetworkStats(ChannelPipeline pipeline, PacketFlow inboundDirection, boolean local, BandwidthDebugMonitor monitor, CallbackInfo ci) {
+        if (inboundDirection == PacketFlow.CLIENTBOUND) {
+            pipeline.addFirst(NetworkTrafficHandler.NETWORK_TRAFFIC_HANDLER_NAME, new NetworkTrafficHandler());
+        }
     }
 }

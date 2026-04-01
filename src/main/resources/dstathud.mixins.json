@@ -4,12 +4,12 @@
   "package": "de.florianmichael.dstathud.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "MixinTpsDebugHudEntry"
+    "MixinDebugEntryTps"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
-    "MixinClientConnection"
+    "MixinConnection"
   ]
 }
